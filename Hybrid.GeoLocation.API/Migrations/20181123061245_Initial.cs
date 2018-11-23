@@ -55,7 +55,7 @@ namespace Hybrid.GeoLocation.API.Migrations
                         column: x => x.CountryISOCode,
                         principalTable: "Countries",
                         principalColumn: "CountryISOCode",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -83,7 +83,7 @@ namespace Hybrid.GeoLocation.API.Migrations
                         column: x => x.RegisteredCountryGeoNameId,
                         principalTable: "Countries",
                         principalColumn: "GeoNameId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,7 +107,7 @@ namespace Hybrid.GeoLocation.API.Migrations
                         column: x => x.RegisteredCountryGeoNameId,
                         principalTable: "Countries",
                         principalColumn: "GeoNameId",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.SetNull);
                 });
 
             migrationBuilder.CreateIndex(

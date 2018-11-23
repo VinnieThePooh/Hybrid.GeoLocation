@@ -15,9 +15,11 @@ namespace Hybrid.GeoLocation.DataAccess.Configurations
                         .WithOne(x => x.CountryGeoData).IsRequired()
                         .HasForeignKey(x => x.CountryISOCode)
                         .HasPrincipalKey(x => x.CountryISOCode)
-                        .OnDelete(DeleteBehavior.Restrict);
-            builder.HasMany(x => x.CityBlockGeoData).WithOne(x => x.CountryGeoData).IsRequired().OnDelete(DeleteBehavior.Restrict);
-            builder.HasMany(x => x.CountryBlockGeoData).WithOne(x => x.CountryGeoData).IsRequired().OnDelete(DeleteBehavior.Restrict);
+                        // on delete behaviour does not work for some reason
+                        // just changed migration code to proper values
+                        .OnDelete(DeleteBehavior.ClientSetNull);
+            builder.HasMany(x => x.CityBlockGeoData).WithOne(x => x.CountryGeoData).IsRequired().OnDelete(DeleteBehavior.ClientSetNull);
+            builder.HasMany(x => x.CountryBlockGeoData).WithOne(x => x.CountryGeoData).IsRequired().OnDelete(DeleteBehavior.ClientSetNull);
         }
     }
 }

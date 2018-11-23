@@ -3,6 +3,7 @@ using Hybrid.GeoLocation.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Threading.Tasks;
+using Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Enums;
 
 namespace Hybrid.GeoLocation.Tests
 {
@@ -10,7 +11,15 @@ namespace Hybrid.GeoLocation.Tests
     {
         static void Main(string[] args)
         {
-            MainAsync().Wait();
+            try
+            {
+                MainAsync().Wait();
+            }
+            catch (Exception exc)
+            {
+                Console.WriteLine();
+                Console.WriteLine(exc.ToString());      
+            }
             Console.ReadKey(true);
         }
 
@@ -27,8 +36,7 @@ namespace Hybrid.GeoLocation.Tests
             var conString = "User ID=ryan; Password=ryanPass12; Host=localhost; Port=5432; Database=Hybrid.Geo; Pooling=true;";
 
             var optionsBuilder = new DbContextOptionsBuilder<GeoContext>();
-            optionsBuilder.UseNpgsql(conString);
-
+            optionsBuilder.UseNpgsql(conString);            
 
             using (var context = new GeoContext(optionsBuilder.Options))
             {
@@ -36,9 +44,14 @@ namespace Hybrid.GeoLocation.Tests
 
                 var zipUrl = "http://geolite.maxmind.com/download/geoip/database/GeoLite2-Country-CSV.zip";
 
-                await updater.UpdateCountries(zipUrl, BusinessLogic.GeoUpdater.Enums.CsvLanguage.English);
-            }
+                Console.Write("Updating Countries table with russian-based data..");
+                await updater.UpdateCountries(zipUrl, CsvLanguage.Russian);
+                Console.WriteLine("completed.");
 
+                Console.Write("Updating Countries table with english-based data..");
+                await updater.UpdateCountries(zipUrl, CsvLanguage.English);
+                Console.WriteLine("completed.");
+            }
         }
 
     }

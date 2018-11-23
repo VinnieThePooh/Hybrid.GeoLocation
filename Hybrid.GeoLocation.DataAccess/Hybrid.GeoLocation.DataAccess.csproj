@@ -13,8 +13,4 @@
     <ProjectReference Include="..\Hybrid.GeoLocation.Domain\Hybrid.GeoLocation.Domain.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>
