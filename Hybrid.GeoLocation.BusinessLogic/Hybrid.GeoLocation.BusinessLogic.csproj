@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hybrid.GeoLocation.DataAccess\Hybrid.GeoLocation.DataAccess.csproj" />
+    <ProjectReference Include="..\Hybrid.GeoLocation.Domain\Hybrid.GeoLocation.Domain.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="9.2.3" />
+  </ItemGroup>
+
+</Project>
