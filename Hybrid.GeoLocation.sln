@@ -11,9 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hybrid.GeoLocation.DataAcce
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hybrid.GeoLocation.API", "Hybrid.GeoLocation.API\Hybrid.GeoLocation.API.csproj", "{0B24A91F-D1AD-4BFD-B765-B034B3725D84}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.GeoLocation.BusinessLogic", "Hybrid.GeoLocation.BusinessLogic\Hybrid.GeoLocation.BusinessLogic.csproj", "{37B0C598-E763-4271-82E4-BAC9629F7B27}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hybrid.GeoLocation.BusinessLogic", "Hybrid.GeoLocation.BusinessLogic\Hybrid.GeoLocation.BusinessLogic.csproj", "{37B0C598-E763-4271-82E4-BAC9629F7B27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hybrid.GeoLocation.Tests", "Hybrid.GeoLocation.Tests\Hybrid.GeoLocation.Tests.csproj", "{6AFB9F78-05F8-4724-8E1B-96479317DCDB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hybrid.GeoLocation.Tests", "Hybrid.GeoLocation.Tests\Hybrid.GeoLocation.Tests.csproj", "{6AFB9F78-05F8-4724-8E1B-96479317DCDB}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documents", "Documents", "{37D1C8F3-6300-42E1-B902-BA414D1B0A7A}"
+	ProjectSection(SolutionItems) = preProject
+		todo.txt = todo.txt
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.Common;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -9,9 +8,7 @@ using CsvHelper;
 using Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Enums;
 using Hybrid.GeoLocation.BusinessLogic.Infrastructure;
 using Hybrid.GeoLocation.DataAccess;
-using Hybrid.GeoLocation.DataAccess.Extensions;
 using Hybrid.GeoLocation.Domain.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 {
@@ -80,7 +77,6 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
                 // very plain update logic is used
                 // old data are removed then new data are inserted
                 // thanks god table is very small
-
                 context.Countries.RemoveRange(context.Countries);
                 await context.SaveChangesAsync();
 
@@ -92,9 +88,11 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 
         public Task UpdateCities(string zipUrl, CsvLanguage csvLanguage = CsvLanguage.Russian)
         {
-            //throw new NotImplementedException();
+            if (string.IsNullOrEmpty(zipUrl))
+                throw new ArgumentException(zipUrl);
 
             Directory.CreateDirectory(DownloadDirectory);
+            
 
             return Task.CompletedTask;
 
