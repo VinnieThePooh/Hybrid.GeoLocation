@@ -77,66 +77,18 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
                 var data = csvReader.GetRecords<CountryGeoData>().ToList();
                 var filtered = data.Where(x => !string.IsNullOrEmpty(x.CountryISOCode) && !string.IsNullOrEmpty(x.CountryName)).ToList();
 
-
                 // very plain update logic is used
                 // old data are removed then new data are inserted
                 // thanks god table is very small
-                var connection = context.Database.GetDbConnection();
-                using (var command = connection.CreateCommand())
-                {                
-                    connection.Open();
 
-                    context.Countries.RemoveRange(context.Countries);
-                    await context.SaveChangesAsync();
+                context.Countries.RemoveRange(context.Countries);
+                await context.SaveChangesAsync();
 
-                    //DropForeingKeysAtCountriesTable(connection, command);
-
-                    //var tableName = "Countries";
-                    //command.CommandText = $"truncate table {tableName.WrapWithQuotes()}";
-                    //command.ExecuteNonQuery();                    
-
-                    //RecreateForeignKeysAtCountriesTable(connection, command);
-                    
-
-                    await context.Countries.AddRangeAsync(filtered);
-                    await context.SaveChangesAsync();
-                    connection.Close();
-                }                
+                context.Countries.AddRange(filtered);
+                await context.SaveChangesAsync();
             }            
-        }
+        }       
         
-        private void DropForeingKeysAtCountriesTable(DbConnection connection, DbCommand command)
-        {
-            var fkName = "FK_Cities_Countries_CountryISOCode";
-            command.CommandText = $"alter table {"Cities".WrapWithQuotes()} drop constraint {fkName.WrapWithQuotes()}";
-            command.ExecuteNonQuery();
-
-            fkName = "FK_CityBlocks_Countries_RegisteredCountryGeoNameId";
-            command.CommandText = $"alter table {"CityBlocks".WrapWithQuotes()} drop constraint {fkName.WrapWithQuotes()}";
-            command.ExecuteNonQuery();
-
-            fkName = "FK_CountryBlocks_Countries_RegisteredCountryGeoNameId";
-            command.CommandText = $"alter table {"CountryBlocks".WrapWithQuotes()} drop constraint {fkName.WrapWithQuotes()}";
-            command.ExecuteNonQuery();            
-        }
-
-        private void RecreateForeignKeysAtCountriesTable(DbConnection connection, DbCommand command)
-        {            
-            var fkName = "FK_Cities_Countries_CountryISOCode";
-            command.CommandText = $"alter table {"Cities".WrapWithQuotes()} add constraint {fkName.WrapWithQuotes()} FOREIGN KEY(\"CountryISOCode\")" +
-            "REFERENCES public.\"Countries\" (\"CountryISOCode\") MATCH SIMPLE ON UPDATE NO ACTION ON DELETE SET NULL;";
-            command.ExecuteNonQuery();
-
-            fkName = "FK_CityBlocks_Countries_RegisteredCountryGeoNameId";
-            command.CommandText = $"alter table {"CityBlocks".WrapWithQuotes()} add constraint {fkName.WrapWithQuotes()} FOREIGN KEY (\"RegisteredCountryGeoNameId\")" +
-            "REFERENCES public.\"Countries\" (\"GeoNameId\") MATCH SIMPLE ON UPDATE NO ACTION ON DELETE SET NULL";
-            command.ExecuteNonQuery();
-
-            fkName = "FK_CountryBlocks_Countries_RegisteredCountryGeoNameId";
-            command.CommandText = $"alter table {"CountryBlocks".WrapWithQuotes()} add constraint {fkName.WrapWithQuotes()} FOREIGN KEY (\"RegisteredCountryGeoNameId\")" +
-            "REFERENCES public.\"Countries\" (\"GeoNameId\") MATCH SIMPLE ON UPDATE NO ACTION ON DELETE SET NULL;";
-            command.ExecuteNonQuery();            
-        }
 
         public Task UpdateCities(string zipUrl, CsvLanguage csvLanguage = CsvLanguage.Russian)
         {
