@@ -6,9 +6,9 @@ using System.Text;
 
 namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 {
-    public class CountryConfiguration: ClassMap<CountryGeoData>
+    public class CountryClassMapConfiguration: ClassMap<CountryGeoData>
     {
-        public CountryConfiguration()
+        public CountryClassMapConfiguration()
         {
             Map(m => m.GeoNameId).Name("geoname_id");
             Map(m => m.LocaleCode).Name("locale_code");

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Hybrid.GeoLocation.BusinessLogic\Hybrid.GeoLocation.BusinessLogic.csproj" />
+    <ProjectReference Include="..\Hybrid.GeoLocation.DataAccess\Hybrid.GeoLocation.DataAccess.csproj" />
+  </ItemGroup>
+
+</Project>

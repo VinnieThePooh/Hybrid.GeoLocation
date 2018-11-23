@@ -6,10 +6,7 @@ namespace Hybrid.GeoLocation.Updater
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Updater will be here!");
-
-
-            IGeoLiteCsvUpdater updater = new GeoLiteCsvUpdater()
+            Console.WriteLine("Updater will be here!");            
 
 
 
