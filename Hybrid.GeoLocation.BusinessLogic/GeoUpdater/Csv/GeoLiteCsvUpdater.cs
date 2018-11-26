@@ -20,15 +20,14 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
         {
             this.context = context ?? throw new ArgumentNullException(nameof(context));
             var appDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            DownloadDirectory = Path.Combine(appDirectory, "Data");          
-
+            DownloadDirectory = Path.Combine(appDirectory, "Data");
         }
 
-        public string DownloadDirectory { get;  }        
+        public string DownloadDirectory { get;  }   
 
         private const string citiesFileNameRu = "";
         private const string countriesFileNameRu = "";
-        private readonly GeoContext context;       
+        private readonly GeoContext context;
 
         
         // todo: refactor
@@ -39,33 +38,7 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 
             Directory.CreateDirectory(DownloadDirectory);
 
-            string pathToDownload = string.Empty;
-
-            await Task.Run(() => {
-
-                using (var webClient = new WebClient())
-                {
-                    var fileName = zipUrl.Split('/').Last();
-                    pathToDownload = Path.Combine(DownloadDirectory, fileName);
-                    webClient.DownloadFile(new Uri(zipUrl), pathToDownload);
-                }
-            });
-
-            var langCode = CsvLanguageMapper.Map[csvLanguage];
-
-            string entryPath = string.Empty;
-
-            using (var stream = File.OpenRead(pathToDownload))
-            using (var zipArchive = new ZipArchive(stream))
-            {
-                var entry = zipArchive.Entries.Single(x => x.Name.Contains(langCode));
-                entryPath = Path.Combine(DownloadDirectory, entry.Name);
-
-                // remove old version of extracted csv
-                File.Delete(entryPath);
-
-                entry.ExtractToFile(entryPath);
-            }            
+            var entryPath = await DownloadAndExtractZip(zipUrl, csvLanguage);            
 
             using (var reader = new StreamReader(entryPath))
             using (var csvReader = new CsvReader(reader))
@@ -96,6 +69,50 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 
             return Task.CompletedTask;
 
+        }
+
+
+        private Task<string> DownloadAndExtractZip(string zipUrl, CsvLanguage language)
+        {
+            return Task.Run(() => {
+
+                string pathToDownload = string.Empty;
+
+                using (var webClient = new WebClient())
+                {
+                    var fileName = zipUrl.Split('/').Last();
+                    pathToDownload = Path.Combine(DownloadDirectory, fileName);
+                    webClient.DownloadFile(new Uri(zipUrl), pathToDownload);
+                }
+
+                var langCode = CsvLanguageMapper.Map[language];
+
+                string entryPath = string.Empty;
+
+                using (var stream = File.OpenRead(pathToDownload))
+                using (var zipArchive = new ZipArchive(stream))
+                {
+                    var entry = zipArchive.Entries.Single(x => x.Name.Contains(langCode));
+                    entryPath = Path.Combine(DownloadDirectory, entry.Name);
+
+                    // remove old version of extracted csv
+                    File.Delete(entryPath);
+
+                    entry.ExtractToFile(entryPath);
+                    return entryPath;
+                }
+            });
+        }
+
+
+        public Task UpdateCountryBlocks(string zipUrl, CsvLanguage language)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task UpdateCityBlocks(string zipUrl, CsvLanguage language)
+        {
+            throw new NotImplementedException();
         }
     }
 }
