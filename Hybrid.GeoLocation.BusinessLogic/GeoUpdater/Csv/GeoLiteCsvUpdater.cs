@@ -169,7 +169,7 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
             }            
         }
 
-        public Task UpdateCityBlocks(string zipUrl, CsvLanguage language)
+        public Task UpdateCityBlocks(string zipUrl)
         {
             throw new NotImplementedException();
         }
