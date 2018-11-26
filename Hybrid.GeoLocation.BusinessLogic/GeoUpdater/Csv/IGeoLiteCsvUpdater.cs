@@ -7,8 +7,8 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
     public interface IGeoLiteCsvUpdater
     {
         Task UpdateCountries(string zipUrl, CsvLanguage language);
-        Task UpdateCountryBlocks(string zipUrl, CsvLanguage language);
+        Task UpdateCountryBlocks(string zipUrl);
         Task UpdateCities(string zipUrl, CsvLanguage language);
-        Task UpdateCityBlocks(string zipUrl, CsvLanguage language);        
+        Task UpdateCityBlocks(string zipUrl);        
     }
 }

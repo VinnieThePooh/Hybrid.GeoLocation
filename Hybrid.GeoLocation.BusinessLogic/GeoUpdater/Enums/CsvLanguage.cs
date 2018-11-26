@@ -6,6 +6,7 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Enums
 {
     public enum CsvLanguage
     {
+        NotDefined,
         English,
         Russian
     }

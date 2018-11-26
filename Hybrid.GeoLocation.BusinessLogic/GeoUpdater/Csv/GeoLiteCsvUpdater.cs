@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using CsvHelper;
+using Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv.MapConfiguration;
 using Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Enums;
 using Hybrid.GeoLocation.BusinessLogic.Infrastructure;
 using Hybrid.GeoLocation.DataAccess;
@@ -38,24 +40,27 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
 
             Directory.CreateDirectory(DownloadDirectory);
 
-            var entryPath = await DownloadAndExtractZip(zipUrl, csvLanguage);            
+            var entryPaths = await DownloadAndExtractZip(zipUrl, csvLanguage);
 
-            using (var reader = new StreamReader(entryPath))
-            using (var csvReader = new CsvReader(reader))
+            foreach (var path in entryPaths)
             {
-                csvReader.Configuration.RegisterClassMap<CountryClassMapConfiguration>();
-                var data = csvReader.GetRecords<CountryGeoData>().ToList();
-                var filtered = data.Where(x => !string.IsNullOrEmpty(x.CountryISOCode) && !string.IsNullOrEmpty(x.CountryName)).ToList();
+                using (var reader = new StreamReader(path))
+                using (var csvReader = new CsvReader(reader))
+                {
+                    csvReader.Configuration.RegisterClassMap<CountryClassMapConfiguration>();
+                    var data = csvReader.GetRecords<CountryGeoData>().ToList();
+                    var filtered = data.Where(x => !string.IsNullOrEmpty(x.CountryISOCode) && !string.IsNullOrEmpty(x.CountryName)).ToList();
 
-                // very plain update logic is used
-                // old data are removed then new data are inserted
-                // thanks god table is very small
-                context.Countries.RemoveRange(context.Countries);
-                await context.SaveChangesAsync();
+                    // very plain update logic is used
+                    // old data are removed then new data are inserted
+                    // thanks god table is very small
+                    context.Countries.RemoveRange(context.Countries);
+                    await context.SaveChangesAsync();
 
-                context.Countries.AddRange(filtered);
-                await context.SaveChangesAsync();
-            }            
+                    context.Countries.AddRange(filtered);
+                    await context.SaveChangesAsync();
+                }
+            }
         }       
         
 
@@ -72,7 +77,7 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
         }
 
 
-        private Task<string> DownloadAndExtractZip(string zipUrl, CsvLanguage language)
+        private Task<string[]> DownloadAndExtractZip(string zipUrl, CsvLanguage language = CsvLanguage.NotDefined)
         {
             return Task.Run(() => {
 
@@ -92,22 +97,76 @@ namespace Hybrid.GeoLocation.BusinessLogic.GeoUpdater.Csv
                 using (var stream = File.OpenRead(pathToDownload))
                 using (var zipArchive = new ZipArchive(stream))
                 {
-                    var entry = zipArchive.Entries.Single(x => x.Name.Contains(langCode));
-                    entryPath = Path.Combine(DownloadDirectory, entry.Name);
+                    if (language != CsvLanguage.NotDefined)
+                    {
+                        var entry = zipArchive.Entries.Single(x => x.Name.Contains(langCode));
+                        entryPath = Path.Combine(DownloadDirectory, entry.Name);
 
-                    // remove old version of extracted csv
-                    File.Delete(entryPath);
+                        // remove old version of extracted csv
+                        File.Delete(entryPath);
 
-                    entry.ExtractToFile(entryPath);
-                    return entryPath;
+                        entry.ExtractToFile(entryPath);
+                        return new string[] { entryPath };
+                    }
+
+                    // blocks data are extracted
+
+                    var entries = zipArchive.Entries.Where(x => x.Name.Contains("IPv4") || x.Name.Contains("IPv6")).ToList();
+
+                    var entriePaths = new List<string>();
+
+                    entries.ForEach(entry => {
+                        var enPath = Path.Combine(DownloadDirectory, entry.Name);
+
+                        // delete old if exists
+                        File.Delete(enPath);
+                        entry.ExtractToFile(enPath);
+                        entriePaths.Add(enPath);
+                    });
+
+                    return entriePaths.ToArray();                
                 }
             });
         }
 
 
-        public Task UpdateCountryBlocks(string zipUrl, CsvLanguage language)
+        public async Task UpdateCountryBlocks(string zipUrl)
         {
-            return Task.CompletedTask;
+            if (string.IsNullOrEmpty(zipUrl))
+                throw new ArgumentException(zipUrl);
+
+            Directory.CreateDirectory(DownloadDirectory);
+
+            var extractedPaths = await DownloadAndExtractZip(zipUrl);
+
+            int counter = 0;
+
+            foreach (var path in extractedPaths)
+            {
+                using (var reader = new StreamReader(path))
+                using (var csvReader = new CsvReader(reader))
+                {
+                    if (counter == 0)
+                    {
+                        csvReader.Configuration.RegisterClassMap<CountryBlockConfiguration>();
+                        context.CountryBlocks.RemoveRange(context.CountryBlocks); 
+                        await context.SaveChangesAsync();
+                        
+                    }
+                    else
+                    {
+                        csvReader.Configuration.RegisterClassMap<CountryBlockIPv6Configuration>();
+                    }
+
+                    var data = csvReader.GetRecords<CountryBlockGeoData>().ToList();
+
+
+                    // IPv4 and IPv6 are considered as different objects
+                    context.CountryBlocks.AddRange(data);
+                    await context.SaveChangesAsync();
+                }
+                counter++;
+            }            
         }
 
         public Task UpdateCityBlocks(string zipUrl, CsvLanguage language)

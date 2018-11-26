@@ -12,9 +12,11 @@ namespace Hybrid.GeoLocation.DataAccess
             Countries = Set<CountryGeoData>();
             Cities = Set<CityGeoData>();
             CityBlocks = Set<CityBlockGeoData>();
+            CountryBlocks = Set<CountryBlockGeoData>();
         }
 
         public DbSet<CountryGeoData> Countries { get; }
+        public DbSet<CountryBlockGeoData> CountryBlocks { get; }
         public DbSet<CityGeoData> Cities { get; }
         public DbSet<CityBlockGeoData> CityBlocks { get; }
 
